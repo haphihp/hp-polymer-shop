@@ -1,0 +1,134 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="hp-category">
+  <template>
+
+  <iron-ajax
+    auto
+    url="http://localhost:2403/product?categoryId={{subrouteData.id}}"
+    handle-as="json"
+    on-response="handleResponse"
+    debounce-duration="300"></iron-ajax>
+    <iron-ajax
+      auto
+      url="http://localhost:2403/category?id={{subrouteData.id}}"
+      handle-as="json"
+      on-response="handleCategory"
+      debounce-duration="300"></iron-ajax>
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .circle {
+        display: inline-block;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 30px;
+        color: #555;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 16px 0;
+        color: #212121;
+      }
+      .table-responsive {
+        width: 100%;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      table, th, td {
+        border: 1px solid #000;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
+    <app-route
+            route="{{subroute}}"
+            pattern="/:id"
+            data="{{subrouteData}}">
+    </app-route>
+
+    <div class="card">
+      <h1>{{brand}}</h1>
+      <table class="table-responsive">
+        <tr>
+          <th>ID</th>
+          <th>Product Name</th>
+          <th>Category</th>
+          <th>Price</th>
+        </tr>
+        <template is="dom-repeat" items="{{products}}">
+          <tr>
+            <td>{{item.id}}</td>
+            <td><a href="/product/{{item.id}}">{{item.name}}</a></td>
+            <td>{{item.categoryId}}</td>
+            <td>{{item.price}}</td>
+          </tr>
+        </template>
+      </table>
+    </div>
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'hp-category',
+      catId: {
+        type: String,
+        notify: true,
+      },
+      brand: {
+        type: String,
+        value: "",
+        notify: true,
+      },
+      products: {
+        type: Array,
+        value: [],
+        notify: true,
+      },
+      handleResponse: function (event, data) {
+        this.products = data.response;
+        console.log(this.products);
+      },
+      handleCategory: function (event, data) {
+        this.brand = data.response.brand;
+      },
+      ready: function () {
+      }
+    });
+
+  </script>
+
+</dom-module>

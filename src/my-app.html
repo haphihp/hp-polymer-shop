@@ -19,12 +19,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="my-icons.html">
 
 <dom-module id="my-app">
 
   <template>
 
+    <iron-ajax
+      id="menu_update"
+      auto
+      url="http://localhost:2403/category"
+      handle-as="json"
+      on-response="handleMenuResponse"
+      debounce-duration="300"></iron-ajax>
     <style>
 
       :host {
@@ -58,8 +66,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .drawer-list a.subroute {
         padding-left: 32px;
       }
-
-
     </style>
 
     <app-location route="{{route}}"></app-location>
@@ -68,6 +74,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
+    <app-route
+        route="{{subroute}}"
+        pattern="/:id"
+        data="{{subrouteData}}">
+    </app-route>
 
     <app-drawer-layout fullbleed>
 
@@ -75,9 +86,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-drawer>
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="view1" href="/view1">View One</a>
-          <a name="view2" href="/view2">View Two</a>
-          <a name="view3" href="/view3">View Three</a>
+          <a name="top" href="/">Home</a>
+          <template is="dom-repeat" items="{{categories}}">
+            <a name="category" href="/category/{{item.id}}">{{item.brand}}</a>
+          </template>
         </iron-selector>
       </app-drawer>
 
@@ -92,9 +104,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-header>
 
         <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-          <my-view1 name="view1"></my-view1>
-          <my-view2 name="view2"></my-view2>
-          <my-view3 name="view3"></my-view3>
+          <hp-top name="top"></hp-top>
+          <hp-category name="category"></hp-category>
+          <hp-product name="product"></hp-product>
         </iron-pages>
 
       </app-header-layout>
@@ -116,6 +128,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           reflectToAttribute: true,
           observer: '_pageChanged'
         },
+        categories: {
+          type: Array,
+          value: [],
+          notify: true,
+        }
 
       },
 
@@ -124,15 +141,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ],
 
       _routePageChanged: function(page) {
-        this.page = page || 'view1';
+        this.page = page || 'top';
       },
 
       _pageChanged: function(page) {
         // load page import on demand.
         this.importHref(
-          this.resolveUrl('my-' + page + '.html'), null, null, true);
-      }
+          this.resolveUrl('hp-' + page + '.html'), null, null, true);
+      },
 
+      handleMenuResponse: function(event, data) {
+        this.categories = data.response;
+      },
     });
 
   </script>
