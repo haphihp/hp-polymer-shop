@@ -9,77 +9,94 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<script>
+    function _deleteProduct(event) {
+        console.log('delete');
+    }
+</script>
 
 <dom-module id="hp-product">
-  <template>
+    <template>
+        <iron-ajax
+            id=""
+            url="http://localhost:2403/product/?id={{subrouteData.id}}"
+            handle-as="json"
+            on-response="handleResponse"
+            debounce-duration="300"></iron-ajax>
 
-  <iron-ajax
-    auto
-    url="http://localhost:2403/product/?id={{subrouteData.id}}"
-    handle-as="json"
-    on-response="handleResponse"
-    debounce-duration="300"></iron-ajax>
+        <iron-ajax
+            auto
+            url="http://localhost:2403/product/?id={{subrouteData.id}}"
+            handle-as="json"
+            on-response="handleResponse"
+            debounce-duration="300"></iron-ajax>
 
-    <app-location route="{{route}}"></app-location>
-    <app-route
+        <app-location route="{{route}}"></app-location>
+        <app-route
             route="{{route}}"
             pattern="/:page"
             data="{{routeData}}"
             tail="{{subroute}}"></app-route>
-    <app-route
+        <app-route
             route="{{subroute}}"
             pattern="/:id"
             data="{{subrouteData}}">
-    </app-route>
+        </app-route>
 
-    <style>
-      :host {
-        display: block;
-        padding: 10px;
-      }
-      .card {
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-        padding: 16px;
-        margin: 24px;
-        border-radius: 5px;
-        background-color: #fff;
-        color: #757575;
-      }
-      h1 {
-        font-size: 22px;
-        margin: 16px 0;
-        color: #212121;
-      }
-    </style>
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+            }
 
-    <div class="card">
-      <h1>{{product.name}}</h1>
-      <div>
-        <label>Category : </label>
-        <span>{{product.categoryId}}</span>
-      </div>
-      <div>
-        <label>Price : </label>
-        <span>{{product.price}}</span>
-      </div>
-    </div>
+            .card {
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                padding: 16px;
+                margin: 24px;
+                border-radius: 5px;
+                background-color: #fff;
+                color: #757575;
+            }
 
-  </template>
+            h1 {
+                font-size: 22px;
+                margin: 16px 0;
+                color: #212121;
+            }
+        </style>
 
-  <script>
+        <div class="card">
+            <h1>{{product.name}}</h1>
+            <div>
+                <label>Category : </label>
+                <span>{{product.categoryId}}</span>
+            </div>
+            <div>
+                <label>Price : </label>
+                <span>{{product.price}}</span>
+            </div>
+            <div class="">
+                <a href="/product-edit/{{product.id}}">Edit</a>
+                <paper-button raised onclick="_deleteProduct(event)">Delete</paper-button>
+            </div>
+        </div>
 
-    Polymer({
-      is: 'hp-product',
-      product: {
-        type: {},
-        notify: true,
-      },
-      handleResponse: function (event, data) {
-        this.product = data.response;
-        console.log(this.product);
-      }
-    });
+    </template>
 
-  </script>
+    <script>
+
+        Polymer({
+            is: 'hp-product',
+            product: {
+                type: {},
+                notify: true,
+            },
+            handleResponse: function (event, data) {
+                this.product = data.response;
+                console.log(this.product);
+            }
+        });
+
+    </script>
 
 </dom-module>

@@ -1,11 +1,3 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/iron-form/iron-form.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-
 <script>
     function _submit(event) {
         Polymer.dom(event).localTarget.parentElement.submit();
@@ -16,7 +8,7 @@
     }
 </script>
 
-<dom-module id="hp-product-new">
+<dom-module id="hp-product-edit">
     <template>
 
         <iron-ajax
@@ -25,6 +17,25 @@
         handle-as="json"
         on-response="handleCategories"
         debounce-duration="300"></iron-ajax>
+
+        <iron-ajax
+            auto
+            url="http://localhost:2403/product/?id={{subrouteData.id}}"
+            handle-as="json"
+            on-response="handleProduct"
+            debounce-duration="300"></iron-ajax>
+
+        <app-location route="{{route}}"></app-location>
+        <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
+        <app-route
+            route="{{subroute}}"
+            pattern="/:id"
+            data="{{subrouteData}}">
+        </app-route>
 
         <style>
             :host {
@@ -49,20 +60,20 @@
         </style>
 
         <div class="card">
-            <h1>Create product</h1>
+            <h1>Edit product</h1>
             <form is="iron-form" method="post" action="http://localhost:2403/product" id="form_submit">
-                <paper-input name="name" label="Name" required></paper-input>
-                <paper-dropdown-menu label="Category" name="categoryId" attr-for-selected="value" required>
-                    <paper-menu class="dropdown-content">
+                <input type="hidden" name="id" value="{{product.id}}"/>
+                <paper-input name="name" label="Name" required value="{{product.name}}"></paper-input>
+                <paper-dropdown-menu label="Category" name="categoryId" required>
+                    <paper-menu class="dropdown-content" selectedValues="{{product.categoryId}}">
                         <template is="dom-repeat" items="{{categories}}">
                             <paper-item value="{{item.id}}">{{item.brand}}</paper-item>
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
-                <paper-input name="price" label="Price" required></paper-input>
+                <paper-input name="price" label="Price" required value="{{product.price}}" type="number" min="0"></paper-input>
                 <br>
-                <paper-button raised onclick="_submit(event)">Submit</paper-button>
-                <paper-button raised onclick="_reset(event)">Reset</paper-button>
+                <paper-button raised onclick="_submit(event)">Save</paper-button>
             </form>
         </div>
 
@@ -70,18 +81,32 @@
 
     <script>
         Polymer({
-            is: 'hp-product-new',
+            is: 'hp-product-edit',
             categories: {
                 type: Array,
                 value: [],
                 notify: true,
+            },
+            product: {
+                type: {},
+                notify: true,
+            },
+            categoryNumber: {
+                type: Number,
+                value: 0,
             },
             handleCategories: function(event, data) {
                 if (data.response) {
                     this.categories = data.response;
                     console.log(this.categories);
                 }
-            }
+            },
+            handleProduct: function(event, data) {
+                if (data.response) {
+                    this.product = data.response;
+                    console.log(this.categories);
+                }
+            },
         });
     </script>
 

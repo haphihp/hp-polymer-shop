@@ -20,6 +20,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+
 <link rel="import" href="my-icons.html">
 
 <dom-module id="my-app">
@@ -87,6 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="top" href="/">Home</a>
+          <a name="product-new" href="/product-new">Create product</a>
           <template is="dom-repeat" items="{{categories}}">
             <a name="category" href="/category/{{item.id}}">{{item.brand}}</a>
           </template>
@@ -105,6 +114,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
           <hp-top name="top"></hp-top>
+          <hp-product-new name="product-new"></hp-product-new>
+          <hp-product-edit name="product-edit"></hp-product-edit>
           <hp-category name="category"></hp-category>
           <hp-product name="product"></hp-product>
         </iron-pages>
