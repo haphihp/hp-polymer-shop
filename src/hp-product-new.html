@@ -51,7 +51,7 @@
         <div class="card">
             <h1>Create product</h1>
             <form is="iron-form" method="post" action="http://localhost:2403/product" id="form_submit">
-                <paper-input name="name" label="Name" required></paper-input>
+                <paper-input name="name" label="Name" required error-message="Invalid input!"></paper-input>
                 <paper-dropdown-menu label="Category" name="categoryId" attr-for-selected="value" required>
                     <paper-menu class="dropdown-content">
                         <template is="dom-repeat" items="{{categories}}">
@@ -59,13 +59,12 @@
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
-                <paper-input name="price" label="Price" required></paper-input>
+                <paper-input type="number" min="0" name="price" label="Price" required error-message="Please input number"></paper-input>
                 <br>
                 <paper-button raised onclick="_submit(event)">Submit</paper-button>
                 <paper-button raised onclick="_reset(event)">Reset</paper-button>
             </form>
         </div>
-
     </template>
 
     <script>
@@ -81,7 +80,7 @@
                     this.categories = data.response;
                     console.log(this.categories);
                 }
-            }
+            },
         });
     </script>
 
