@@ -19,10 +19,21 @@
         debounce-duration="300"></iron-ajax>
 
         <iron-ajax
+        id="updateProduct"
+        method="PUT"
+        url="http://localhost:2403/product/{{subrouteData.id}}"
+        body="{{updateProductData}}"
+        content-type="application/json"
+        handle-as="json"
+        on-response="handleUpdateProduct"
+        on-error="handleErrorProduct"></iron-ajax>
+
+        <iron-ajax
             auto
-            url="http://localhost:2403/product/?id={{subrouteData.id}}"
+            url="http://localhost:2403/product/{{subrouteData.id}}"
             handle-as="json"
             on-response="handleProduct"
+            on-error="handleProductError"
             debounce-duration="300"></iron-ajax>
 
         <app-location route="{{route}}"></app-location>
@@ -57,24 +68,32 @@
                 margin: 16px 0;
                 color: #212121;
             }
+            #toast {
+                left: 280px !important;
+            }
         </style>
 
         <div class="card">
             <h1>Edit product</h1>
+            <template is="dom-if" if="{{error}}">
+                <span class="error">{{errorMessage}}</span>
+            </template>
+            <template is="dom-if" if="{{!error}}">
             <form is="iron-form" method="post" action="http://localhost:2403/product" id="form_submit">
-                <input type="hidden" name="id" value="{{product.id}}"/>
-                <paper-input name="name" label="Name" required value="{{product.name}}"></paper-input>
-                <paper-dropdown-menu label="Category" name="categoryId" required>
-                    <paper-menu class="dropdown-content" selectedValues="{{product.categoryId}}">
+                <paper-input name="name" label="Name" required value="{{productName}}"></paper-input>
+                <paper-dropdown-menu label="Category" name="categoryId" required value="{{categoryId}}">
+                    <paper-menu class="dropdown-content" selectedValues="{{product.categoryId}}" attrForSelected="value">
                         <template is="dom-repeat" items="{{categories}}">
                             <paper-item value="{{item.id}}">{{item.brand}}</paper-item>
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
-                <paper-input name="price" label="Price" required value="{{product.price}}" type="number" min="0"></paper-input>
+                <paper-input name="price" label="Price" required value="{{productPrice}}" type="number" min="0"></paper-input>
                 <br>
-                <paper-button raised onclick="_submit(event)">Save</paper-button>
+                <paper-button raised on-tap="_submit">Save</paper-button>
             </form>
+            </template>
+            <paper-toast id="toast" text="[[responseMessage]]"></paper-toast>
         </div>
 
     </template>
@@ -95,6 +114,36 @@
                 type: Number,
                 value: 0,
             },
+            error: {
+                type: Boolean,
+                value: false,
+                notify: true,
+            },
+            errorMessage: {
+                type: String,
+                notify: true,
+            },
+            productName: {
+                type: String,
+                notify: true,
+            },
+            productPrice: {
+                type: Number,
+                notify: true,
+            },
+            categoryId: {
+                type: String,
+                notify: true,
+            },
+            updateProductData: {
+                type: Object,
+                value: {},
+                notify: true,
+            },
+            responseMessage: {
+                type: String,
+                notify: true,
+            },
             handleCategories: function(event, data) {
                 if (data.response) {
                     this.categories = data.response;
@@ -103,10 +152,33 @@
             },
             handleProduct: function(event, data) {
                 if (data.response) {
-                    this.product = data.response;
-                    console.log(this.categories);
+                    this.productName = data.response.name;
+                    this.productPrice = data.response.price;
+                    this.categoryId = data.response.categoryId;
+                    this.error = false;
                 }
             },
+            handleProductError: function (event, data) {
+                this.error = true;
+                this.errorMessage = 'This item did not exist';
+            },
+            handleUpdateProduct: function() {
+                this.responseMessage = 'Update successfully';
+                this.$.toast.open();
+            },
+            handleErrorProduct: function () {
+                this.responseMessage = 'Update failure';
+                this.$.toast.open();
+            },
+            _submit: function (event, data) {
+                this.updateProductData = {
+                    'name' : this.productName,
+                    'price' : this.productPrice,
+                    'categoryId' : this.categoryId,
+                };
+                console.log(this.updateProductData);
+                this.$.updateProduct.generateRequest();
+            }
         });
     </script>
 

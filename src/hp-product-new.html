@@ -26,6 +26,17 @@
         on-response="handleCategories"
         debounce-duration="300"></iron-ajax>
 
+        <iron-ajax
+            id="createProduct"
+            method="POST"
+            body="{{createProductBody}}"
+            url="http://localhost:2403/product"
+            handle-as="json"
+            content-type="application/json"
+            on-response="handleCreateProduct"
+            on-error="handleErrorProduct"
+            debounce-duration="300"></iron-ajax>
+
         <style>
             :host {
                 display: block;
@@ -46,24 +57,29 @@
                 margin: 16px 0;
                 color: #212121;
             }
+            #toast {
+                left: 280px !important;
+            }
         </style>
 
         <div class="card">
             <h1>Create product</h1>
             <form is="iron-form" method="post" action="http://localhost:2403/product" id="form_submit">
-                <paper-input name="name" label="Name" required error-message="Invalid input!"></paper-input>
-                <paper-dropdown-menu label="Category" name="categoryId" attr-for-selected="value" required>
-                    <paper-menu class="dropdown-content">
+                <paper-input name="name" label="Name" required error-message="Invalid input!" value="{{productName}}"></paper-input>
+                <paper-dropdown-menu label="Category" name="categoryId" required value="{{categoryId}}">
+                    <paper-menu class="dropdown-content" attr-for-selected="value">
                         <template is="dom-repeat" items="{{categories}}">
                             <paper-item value="{{item.id}}">{{item.brand}}</paper-item>
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
-                <paper-input type="number" min="0" name="price" label="Price" required error-message="Please input number"></paper-input>
+                <paper-input type="number" min="0" name="price" label="Price" value="{{productPrice}}" required error-message="Please input number"></paper-input>
                 <br>
-                <paper-button raised onclick="_submit(event)">Submit</paper-button>
+                <!--<paper-button raised onclick="_submit(event)">Submit</paper-button>-->
+                <paper-button raised on-tap="_submit">CREATE</paper-button>
                 <paper-button raised onclick="_reset(event)">Reset</paper-button>
             </form>
+            <paper-toast id="toast" text="{{responseMessage}}"></paper-toast>
         </div>
     </template>
 
@@ -75,12 +91,58 @@
                 value: [],
                 notify: true,
             },
+            productName: {
+                type: String,
+                notify: true,
+            },
+            categoryId: {
+                type: String,
+                notify: true,
+            },
+            productPrice: {
+                type: Number,
+                value: 0,
+                notify: true,
+            },
+            createProductBody: {
+                type: Object,
+                value: {},
+                notify: true,
+            },
+            responseMessage: {
+                type: String,
+                notify: true,
+            },
+            ready: function() {
+                this.productName = '';
+                this.productPrice = '';
+                this.categoryId = '';
+            },
             handleCategories: function(event, data) {
                 if (data.response) {
                     this.categories = data.response;
                     console.log(this.categories);
                 }
             },
+            handleCreateProduct: function (e, d) {
+                console.log('Create data success');
+                this.responseMessage = 'Create item successfully';
+                this.$.toast.open();
+            },
+            handleErrorProduct: function() {
+                console.log('Create data success');
+                this.responseMessage = 'Create item failure';
+                this.$.toast.open();
+            },
+            _submit: function() {
+                this.createProductBody = {
+                    "name": this.productName,
+                    "categoryId": this.categoryId,
+                    "price": this.productPrice,
+                };
+                console.log(this.createProductBody);
+                this.$.createProduct.generateRequest();
+            }
         });
     </script>
 
